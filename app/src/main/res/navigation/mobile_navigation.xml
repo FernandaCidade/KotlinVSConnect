@@ -9,13 +9,13 @@
             android:id="@+id/nav_home"
             android:name="com.senai.vsconnect_kotlin.views.EditarImagemFragment"
             android:label="@string/menu_home"
-            tools:layout="@layout/fragment_home"/>
+            tools:layout="@layout/fragment_editar_imagem"/>
 
     <fragment
             android:id="@+id/nav_gallery"
             android:name="com.senai.vsconnect_kotlin.views.ListaServicosFragment"
             android:label="@string/menu_gallery"
-            tools:layout="@layout/fragment_gallery"/>
+            tools:layout="@layout/fragment_lista_servicos"/>
 
     <fragment
             android:id="@+id/nav_slideshow"
