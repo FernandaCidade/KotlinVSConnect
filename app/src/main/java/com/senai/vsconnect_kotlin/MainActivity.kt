@@ -26,6 +26,9 @@ class MainActivity : AppCompatActivity() {
 
         setSupportActionBar(binding.appBarMain.toolbar)
 
+        //desabilita a exibiçao do titulo do nome da tela atual
+        supportActionBar?.setDisplayShowTitleEnabled(false)
+
         binding.appBarMain.fab.setOnClickListener { view ->
             Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                 .setAction("Action", null).show()
