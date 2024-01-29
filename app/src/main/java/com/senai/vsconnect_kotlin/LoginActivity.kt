@@ -5,13 +5,25 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.EditText
+import android.widget.Toast
+import com.google.gson.JsonObject
+import com.senai.vsconnect_kotlin.apis.EndpointInterface
+import com.senai.vsconnect_kotlin.apis.RetrofitConfig
 import com.senai.vsconnect_kotlin.databinding.ActivityLoginBinding
 import com.senai.vsconnect_kotlin.models.Login
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import java.util.Base64
 
 class LoginActivity : AppCompatActivity() {
 
     //É uma propriedade privada  como o nome binding do tipo ActivityLoginBinding
     private lateinit var binding: ActivityLoginBinding
+
+    private val clienteRetrofit = RetrofitConfig.obterInstanciaRetrofit()
+
+    private val endpoints = clienteRetrofit.create(EndpointInterface::class.java)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,5 +56,35 @@ class LoginActivity : AppCompatActivity() {
 
         val usuario = Login(emailDigitado, senhaDigitado)
 
+        endpoints.login(usuario).enqueue(object : Callback<JsonObject> {
+            override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
+                when(response.code()){
+                    200 -> {}
+                    403 -> { tratarFalhaNaAutenticacao("E-mail e/ou senha inválidos.") }
+                    else -> { tratarFalhaNaAutenticacao("Falha ao se logar!") }
+                }
+            }
+
+            override fun onFailure(call: Call<JsonObject>, t: Throwable) {
+                tratarFalhaNaAutenticacao("Falha ao tentar se logar!")
+            }
+
+        })
     }
+
+    private fun tratarFalhaNaAutenticacao(mensagemErro: String){
+        Toast.makeText(this, mensagemErro, Toast.LENGTH_SHORT).show()
+    }
+
+    private fun decodificarToken(token: String): Any {
+        val partes = token.split(".")
+        val payloadBase64 = partes[1]
+
+        val payloadBytes = Base64.getUrlDecoder().decode(payloadBase648)
+        val payloadJson = String(payloadBytes, StandardCharsets.UTF_8)
+
+        val json = JSONObject(payloadJson)
+        return json["idUsuario"].toStringfy()
+    }
+
 }
