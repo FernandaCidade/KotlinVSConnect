@@ -1,5 +1,6 @@
 package com.senai.vsconnect_kotlin
 
+import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -11,9 +12,11 @@ import com.senai.vsconnect_kotlin.apis.EndpointInterface
 import com.senai.vsconnect_kotlin.apis.RetrofitConfig
 import com.senai.vsconnect_kotlin.databinding.ActivityLoginBinding
 import com.senai.vsconnect_kotlin.models.Login
+import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.nio.charset.StandardCharsets
 import java.util.Base64
 
 class LoginActivity : AppCompatActivity() {
@@ -34,12 +37,7 @@ class LoginActivity : AppCompatActivity() {
         //setOnClickListener é um ouvinte de clique
         //Ou seja, quando clicar no botão entrar irá cair nesse bloco
         binding.btnEntrar.setOnClickListener {
-            //variável mainIntent com a intenção de sair da LoginActivity e ir para MainActivity
-            val mainIntent = Intent(this@LoginActivity, MainActivity::class.java)
-            //executa a intenção armazenada na variável mainIntent
-            startActivity(mainIntent)
-            //finaliza a LoginActivity
-            finish()
+            autenticarUsuario()
         }
         setContentView(binding.root)
 
@@ -59,7 +57,24 @@ class LoginActivity : AppCompatActivity() {
         endpoints.login(usuario).enqueue(object : Callback<JsonObject> {
             override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
                 when(response.code()){
-                    200 -> {}
+                    200 -> {
+                        val idUsuario = decodificarToken(response.body().toString())
+
+                        val sharedPreferences = getSharedPreferences("idUsuario", Context.MODE_PRIVATE)
+
+                        val editor = sharedPreferences.edit()
+
+                        editor.putString("idUsuario", idUsuario.toString())
+
+                        editor.apply()
+
+                        //direcionando o usuário para tela lista de serviços
+                        val mainIntent = Intent(this@LoginActivity, MainActivity::class.java)
+
+                        startActivity(mainIntent)
+
+                        finish()
+                    }
                     403 -> { tratarFalhaNaAutenticacao("E-mail e/ou senha inválidos.") }
                     else -> { tratarFalhaNaAutenticacao("Falha ao se logar!") }
                 }
@@ -80,11 +95,11 @@ class LoginActivity : AppCompatActivity() {
         val partes = token.split(".")
         val payloadBase64 = partes[1]
 
-        val payloadBytes = Base64.getUrlDecoder().decode(payloadBase648)
+        val payloadBytes = Base64.getUrlDecoder().decode(payloadBase64)
         val payloadJson = String(payloadBytes, StandardCharsets.UTF_8)
 
         val json = JSONObject(payloadJson)
-        return json["idUsuario"].toStringfy()
+        return json["idUsuario"].toString()
     }
 
 }
