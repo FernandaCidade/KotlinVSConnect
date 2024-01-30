@@ -34,6 +34,14 @@ class LoginActivity : AppCompatActivity() {
         //Atribui à variável binding um objeto que contém referências (propriedades) aos elementos definidos no layout
         binding = ActivityLoginBinding.inflate(layoutInflater)
 
+        val sharedPreferences = getSharedPreferences("idUsuario", Context.MODE_PRIVATE)
+
+        val editor = sharedPreferences.edit()
+
+        editor.remove("idUsuario")
+
+        editor.apply()
+
         //setOnClickListener é um ouvinte de clique
         //Ou seja, quando clicar no botão entrar irá cair nesse bloco
         binding.btnEntrar.setOnClickListener {
